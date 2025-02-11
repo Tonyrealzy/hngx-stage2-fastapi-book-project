@@ -10,9 +10,10 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_USER }}
-          username: linuxserver.io
+          username: Tonyrealzy
           key: ${{ secrets.SSH_KEY }}
-          script: cd /hngx-stage2-fastapi-book-project
+          script: | 
+              cd /hngx-stage2-fastapi-book-project
               cd fastapi-book-project
               git pull origin test-main
               source venv/bin/activate
