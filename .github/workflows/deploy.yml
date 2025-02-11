@@ -1,30 +1,33 @@
-name: Deployment Pipeline
+name: Deploy FastAPI on Linux Server
 
 on:
   push:
     branches:
-      - main
+      - main  # Deploys when PR is merged into main
 
 jobs:
   deploy:
-    name: Deploy to Server
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      - name: Set up SSH Key
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: /m2EIVkOt4l5WRNjaOHtfl3nLjAfWZ1pkPtgk5Cfkg8
-
-      - name: Deploy Application
+      - name: Deploy to Linux Server
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@${{your-server-ip}} << 'EOF'
-            cd ${{/path/to/your/project}}
+          echo "$SSH_KEY" > deploy_key.pem
+          chmod 600 deploy_key.pem
+          ssh -o StrictHostKeyChecking=no -i deploy_key.pem $SSH_USER@$SERVER_IP << 'EOF'
+            cd /var/www/fastapi-app
             git pull origin main
             source venv/bin/activate
             pip install -r requirements.txt
-            systemctl restart fastapi-app
+            sudo systemctl restart fastapi
+            sudo systemctl restart nginx
           EOF
+
+
