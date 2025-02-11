@@ -1,9 +1,14 @@
 name: CI - Test hngx-stage2-fastapi-book-project
 
 on:
+    # Remove this first command
+  push:
+    branches:
+      - test-main # Runs when pushing to test-main
   pull_request:
     branches:
-      - main # Runs on PRs to main branch
+      - main # Runs when creating a PR to main
+
 
 jobs:
   test:
