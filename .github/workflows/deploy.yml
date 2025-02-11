@@ -9,6 +9,7 @@ on:
     branches:
       - main # Runs when creating a PR to main
 
+      
 jobs:
   deploy:
     runs-on: ubuntu-latest
