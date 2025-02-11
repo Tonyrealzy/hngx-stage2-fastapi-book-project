@@ -1,0 +1,30 @@
+name: Deployment Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH Key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: /m2EIVkOt4l5WRNjaOHtfl3nLjAfWZ1pkPtgk5Cfkg8
+
+      - name: Deploy Application
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{your-server-ip}} << 'EOF'
+            cd ${{/path/to/your/project}}
+            git pull origin main
+            source venv/bin/activate
+            pip install -r requirements.txt
+            systemctl restart fastapi-app
+          EOF
