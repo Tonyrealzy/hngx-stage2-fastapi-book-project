@@ -1,40 +1,20 @@
 name: Deploy FastAPI on Linux Server
 
-on:
-  # Remove this first command
-  push:
-    branches:
-      - test-main # Runs when pushing to test-main
-  pull_request:
-    branches:
-      - main # Runs when creating a PR to main
-
-      
+on: [push]
 jobs:
   deploy:
+    name: Deploy main
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Set Up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-
-      - name: Deploy to Linux Server
-        run: |
-            ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            cd /home/${{ secrets.SSH_USER }}/hngx-stage2-fastapi-book-project
-            # git pull origin main
-            git fetch origin test-main
-            git checkout test-main
-            git pull origin test-main
-            source venv/bin/activate
-            pip install -r requirements.txt
-            sudo systemctl restart nginx
-            sudo systemctl restart fastapi
-            EOF
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_USER }}
+          username: linuxserver.io
+          key: ${{ secrets.SSH_KEY }}
+          script: cd /hngx-stage2-fastapi-book-project
+              cd fastapi-book-project
+              git pull origin test-main
+              source venv/bin/activate
+              pip install -r requirements.txt
+              sudo systemctl restart fastapi
