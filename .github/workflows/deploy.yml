@@ -19,6 +19,8 @@ jobs:
           script: |
             cd hngx-stage2-fastapi-book-project
             git pull origin main
+            python3 -m venv venv
             source venv/bin/activate
             pip install -r requirements.txt
-            sudo systemctl restart fastapi
+            sudo systemctl restart nginx
+            sudo systemctl restart fastapi_nginx
