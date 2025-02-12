@@ -1,4 +1,5 @@
 # FastAPI Book Management API
+#### [http://51.21.162.206/api/v1/books/1](http://51.21.162.206/api/v1/books/1)
 
 ## Overview
 
@@ -16,7 +17,7 @@ This project is a RESTful API built with FastAPI for managing a book collection.
 ## Project Structure
 
 ```
-fastapi-book-project/
+hngx-stage2-fastapi-book-project/
 ├── api/
 │   ├── db/
 │   │   ├── __init__.py
@@ -49,8 +50,8 @@ fastapi-book-project/
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/hng12-devbotops/fastapi-book-project.git
-cd fastapi-book-project
+git clone https://github.com/Tonyrealzy/hngx-stage2-fastapi-book-project
+cd /hngx-stage2-fastapi-book-project
 ```
 
 2. Create a virtual environment:
@@ -128,6 +129,96 @@ The API includes proper error handling for:
 - Invalid book IDs
 - Invalid genre types
 - Malformed requests
+
+## Deployment Instructions
+
+To deploy this FastAPI application on a Linux server, follow these steps:
+
+### 1. Set Up the Server  
+Ensure your server has Python, Git, and Nginx installed. If not, install them:
+
+```bash
+sudo apt update && sudo apt install -y python3 python3-venv python3-pip nginx git
+```
+### 2. Clone the Repository
+Navigate to the deployment directory and clone the project:
+```
+cd /home/your-user/
+git clone https://github.com/Tonyrealzy/hngx-stage2-fastapi-book-project.git
+cd hngx-stage2-fastapi-book-project
+```
+### 3. Set Up a Virtual Environment
+Create and activate a virtual environment:
+```
+python3 -m venv venv
+source venv/bin/activate
+```
+### 4. Install Dependencies
+Run:
+```
+pip install -r requirements.txt
+```
+### 5. Start the FastAPI Application
+Configure Nginx as a Reverse Proxy
+Edit the Nginx config:
+```
+sudo nano /etc/nginx/sites-available/fastapi
+```
+Add:
+```
+nginx
+```
+```
+server {
+    listen 80;
+    server_name your-server-ip;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+Save and enable the configuration:
+```
+sudo ln -s /etc/nginx/sites-available/fastapi /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+```
+### Environment Variables
+The application relies on environment variables for configuration.
+You can define them in a .env file inside the project root:
+```
+SECRET_KEY=your-secret-key
+DATABASE_URL=sqlite:///./database.db
+DEBUG=True
+```
+To load them, install python-dotenv:
+```
+pip install python-dotenv
+```
+And modify config.py:
+```
+from dotenv import load_dotenv
+import os
+load_dotenv()
+```
+```
+SECRET_KEY = os.getenv("SECRET_KEY")
+DATABASE_URL = os.getenv("DATABASE_URL")
+DEBUG = os.getenv("DEBUG")
+```
+OR
+```
+export SECRET_KEY="your-secret-key"
+export DATABASE_URL="sqlite:///./database.db"
+export DEBUG="True"
+```
+#### Now your FastAPI application is fully configured and ready to run in a production environment.
+
 
 ## Contributing
 
